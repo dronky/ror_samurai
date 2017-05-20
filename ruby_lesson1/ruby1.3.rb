@@ -16,6 +16,8 @@ sides = gets.chomp.split(',').map(&:to_f).sort
 a, b, c = sides
 if a == b && b == c
 	puts 'triangle is equilateral and isosceles'
+elsif !((a**2 + b**2 == c**2) || (sides.uniq.length != sides.length))
+	puts 'triangle is common'
 else
 	if a**2 + b**2 == c**2
 		puts 'triangle is rectangular'
