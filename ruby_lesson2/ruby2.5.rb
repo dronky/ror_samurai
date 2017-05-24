@@ -2,20 +2,15 @@
 #если он делится без остатка на 400, это високосный год. Таким образом, 2000 г. является особым високосным годом, 
 #который бывает лишь раз в 400 лет.
 #дано: nn,mm,yy. Найти порядковый номер даты, начиная отсчет с начала года. Учесть, что год может быть високосным.
-def visoc(year)
-    return (year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0
-end
 
 puts "Enter day, month, year (DD,MM,YYYY with delimiter ','):"
 day = gets.chomp.split(',').map(&:to_i)
 days = [31,28,31,30,31,30,31,31,30,31,30,31]
-days[1] = 29 if visoc(day[1])
-result = 0
-puts days[0..day[1]].sum + day[0]
-
-#days.each do |m,d|
-#	if m < day[1]
-#		result += d
-#	end
-#end
-#puts result + day[0]
+days[1] = 29 if (day[2] % 4 == 0 && day[2] % 100 != 0 ) || day[2] % 400 == 0
+if day[1] > 1 
+	puts days[0..day[1]-2].sum + day[0]
+elsif day[1] > 12
+	puts 'You entered wrong month'
+else
+	puts day[0]
+end
