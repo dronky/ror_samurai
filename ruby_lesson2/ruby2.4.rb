@@ -1,11 +1,10 @@
 #Заполнить хеш гласными буквами,
 #где значением будет являтся порядковый номер буквы в алфавите (a - 1).
 # =~ то же самое что .match
-arr = ('a'..'z').to_a
-h = {}
-arr.each do |i|
-	if i =~ /['aeiou']/
-		h[i]=arr.index(i)+1
-	end
+letter = ('a'..'z').to_a
+vowels = ['a','e','i','o','u']
+vowels_hash = {}
+vowels.each do |vowel|
+	vowels_hash[vowel] = letter.index(vowel) + 1
 end
-puts h
+puts vowels_hash

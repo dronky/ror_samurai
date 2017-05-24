@@ -3,18 +3,19 @@
 #который бывает лишь раз в 400 лет.
 #дано: nn,mm,yy. Найти порядковый номер даты, начиная отсчет с начала года. Учесть, что год может быть високосным.
 def visoc(year)
-    return true if (year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0
-    false
+    return (year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0
 end
 
-puts "Enter number, month, year (NN,MM,YYYY with delimiter ','):"
-nmy = gets.chomp.split(',').map(&:to_i)
-days = {1=>31, 2=>28, 3=>31, 4=>30, 5=>31, 6=>30, 7=>31, 8=>31, 9=>30, 10=>31, 11=>30, 12=>31}
-days[2] = 29 if visoc(nmy[2])
+puts "Enter day, month, year (DD,MM,YYYY with delimiter ','):"
+day = gets.chomp.split(',').map(&:to_i)
+days = [31,28,31,30,31,30,31,31,30,31,30,31]
+days[1] = 29 if visoc(day[1])
 result = 0
-days.each do |m,d|
-	if m < nmy[1]
-		result += d
-	end
-end
-puts result + nmy[0]
+puts days[0..day[1]].sum + day[0]
+
+#days.each do |m,d|
+#	if m < day[1]
+#		result += d
+#	end
+#end
+#puts result + day[0]

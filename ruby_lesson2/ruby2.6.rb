@@ -12,21 +12,21 @@ shop = {}
 loop do
   puts 'enter product or "stop":'
   tovar = gets.chomp
-  if tovar == 'stop'
-  	break
-  else
-  	puts 'enter price:'
-    price = gets.chomp.to_f
-    puts 'enter count:'
-    count = gets.chomp.to_f
-    prcnt = {:price => price, :count => count }
-    shop[tovar.to_sym] = prcnt
+  break if tovar == 'stop'
+  if shop.has_key?(tovar.to_sym)
+  	puts "are you sure want to change price/count of #{tovar}? y/n(default - no)" 
+	next if gets.chomp == 'n'
   end
+  puts 'enter price:'
+  price = gets.chomp.to_f
+  puts 'enter count:'
+  count = gets.chomp.to_f
+  shop[tovar.to_sym] = {price: price, count: count }
 end
 total = 0.0
 shop.each do |tovar, value|
-	tmpCost = value[:price]*value[:count]
-  	puts "Total by #{tovar.to_s}: " + tmpCost.to_s + " rub"
-  	total += tmpCost
+	tmp_cost = value[:price]*value[:count]
+  	puts "Total by #{tovar}: " + tmp_cost.to_s + " rub"
+  	total += tmp_cost
 end
 puts "Ypu bought at #{total} rub"
