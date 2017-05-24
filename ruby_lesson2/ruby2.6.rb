@@ -15,7 +15,7 @@ loop do
   break if tovar == 'stop'
   if shop.has_key?(tovar.to_sym)
   	puts "are you sure want to change price/count of #{tovar}? y/n(default - no)" 
-	next if gets.chomp == 'n'
+	next if gets.chomp != 'y'
   end
   puts 'enter price:'
   price = gets.chomp.to_f
