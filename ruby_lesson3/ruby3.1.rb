@@ -32,86 +32,88 @@ class Station
 		@name = name
 	end
 
-	def add_train=(train)
+	def add_train(train)
+		train.current_station = self
 		self.trains << train
 	end
 
-	def del_train=(train)
+	def del_train(train)
 		self.trains.delete(train)
 	end
 
-	def type_trains(type)
-		self.trains.select{|train| train.type == type}
+	def trains(type = nil)
+		if type != nil 
+			@trains.select{|train| train.type == type}
+		else
+			@trains
+		end
 	end
 
 	def depart
-		self.trains.first.depart(1)
+		self.trains.first.depart(:forward)
 	end
 
-	def print_trains(type = "all")
-		gruz = type_trains("gruz")
-		pass = type_trains("pass")
+	def print_train(type = nil)
+		trains(type).each_with_index do |train, i| 
+			puts "Train #{i + 1}: "
+			puts train
+		end
+	end
+
+	def print_trains(type = nil)
 		puts "\n#{self.name} trains:"
 		if self.trains.size > 0
-			if type == "all" 
-				puts "Gruz trains: #{gruz.size} Pass trains: #{pass.size}"
-				self.trains.each do |train| 
-					puts "Train #{self.trains.index(train) + 1}: "
-					train.print_train
-				end
-			elsif type == "gruz"
-				gruz.each do |train|
-					puts "Gruz train #{gruz.index(train) + 1}: "
-					train.print_train
-				end
-			elsif type == "pass"
-				pass.each do |train|
-					puts "Pass train #{pass.index(train) + 1}: "
-					train.print_train
-				end
-			else puts "wrong train type"
+			case type
+			when nil
+				puts "Gruz trains: #{trains("gruz").size} Pass trains: #{trains("pass").size}"
+			when "gruz"
+				puts "Gruz trains: #{trains("gruz").size}"
+			when "pass"
+				puts "Pass trains: #{trains("pass").size}"
+			else 
+				puts "wrong train type"
+				return
 			end
-		else puts "No trains in #{self.name}"
+			print_train(type)
+		else 
+			puts "No trains in #{self.name}"
 		end
 	end
 end
 
 
 class Train
-	attr_accessor :route, :speed, :number, :type, :vag_count
-	def initialize(number,type,vag_count)
+	attr_accessor :route, :speed, :number, :type, :vag_count, :current_station
+	def initialize(number,type)
 		@number = number
 		@type = type
-		@vag_count = vag_count
+		@vag_count = 0
+		@speed = 0
 	end
 
 	def route=(route)
 		@route = route
-		route.stations.first.add_train = self
+		route.stations.first.add_train(self)
 	end
 
-	def print_train
-		puts "Number: #{self.number} Type: #{self.type} Vagons count: #{self.vag_count}"
-	end
-
-	def route_stations
-		self.route.stations
-	end
-
-	def current_station
-		route_stations.select{|station| station.trains.include?(self)}.first
+	def to_s
+		"Number: #{self.number} Type: #{self.type} Vagons count: #{self.vag_count}"
 	end
 
 	def current_station_index
-		route_stations.index(current_station)
+		self.route.stations.index(current_station)
 	end
 
 	def next_station
-		route_stations[current_station_index + 1]
+		self.route.stations[current_station_index + 1]
 	end
 
 	def previous_station
-		route_stations[current_station_index - 1]
+		self.route.stations[current_station_index - 1]
+	end
+
+	def increase_speed(speed_gain)
+		self.speed += speed_gain if speed_gain > 0
 	end
 
 	def stop
@@ -136,27 +138,36 @@ class Train
 		end
 	end
 
+	def last_station_reached
+		current_station_index < self.route.stations.size - 1
+	end
+
 	def depart(destination)
 		if self.route != nil
 			case destination
-			when 1
-				if current_station_index < route_stations.size-1
-					next_station.add_train = self
-			 		current_station.del_train = self
-			 		self.stop
-				else puts "you reached last station"
+			when :forward
+				if last_station_reached
+					next_station.add_train(self)
+			 		previous_station.del_train(self)
+				else 
+					puts "you reached last station"
+					return
 				end
-			when -1
+			when :back
 				if current_station_index > 0
-					previous_station.add_train = self
-					next_station.del_train = self	#cause methood current_station get first if one train in multiple stations
-					self.stop
-				else puts "you reached first station"
+					previous_station.add_train(self)
+					next_station.del_train(self) #cause methood current_station get first if one train in multiple stations
+				else 
+					puts "you reached first station"
+					return
 				end
 			else
-				puts "wrong destination! (#{destination}) It can be 1 or -1"
+				puts "wrong destination! (#{destination}) It can be :forward or :back"
+				return
 			end
-		else puts "set route before depart"
+			self.stop
+		else 
+			puts "set route before depart"
 		end
 	end
 end
@@ -165,12 +176,10 @@ class Route
 	attr_reader :stations
 
 	def initialize(start_station,end_station)
-		@start_station = start_station
-		@end_station = end_station
 		@stations = [start_station,end_station]
 	end
 
-	def add_station=(station)
+	def add_station(station)
 		self.stations.insert(-2,station)
 	end
 
@@ -191,25 +200,28 @@ pushkino = Station.new("pushkino")
 
 #and 3 routes
 route1 = Route.new(primorsk,gatka)
-route1.add_station = pochinki
+route1.add_station(pochinki)
 
 route2 = Route.new(gatka,pochinki)
 
 route3 = Route.new(pochinki,pushkino)
 
 #and 3 trains
-sapsan = Train.new("813hfs211",'pass',2)
-tg16m = Train.new("tg16m-005",'gruz',10)
-vityaz = Train.new("2te25am-019",'gruz',13)
+sapsan = Train.new("813hfs211",'pass')
+tg16m = Train.new("tg16m-005",'gruz')
+vityaz = Train.new("2te25am-019",'gruz')
 
 #assign routes to trains
 #All trains go to pochinki
 sapsan.route = route1
+sapsan.add_vagon
 sapsan.speed = 10
-sapsan.depart(1)
+sapsan.depart(:forward)
 
 tg16m.route = route2
-tg16m.depart(1)
+tg16m.add_vagon
+tg16m.add_vagon
+tg16m.depart(:forward)
 
 vityaz.route = route3
 
