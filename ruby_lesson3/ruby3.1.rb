@@ -139,14 +139,14 @@ class Train
 	end
 
 	def last_station_reached
-		current_station_index < self.route.stations.size - 1
+		current_station_index == self.route.stations.size - 1
 	end
 
 	def depart(destination)
 		if self.route != nil
 			case destination
 			when :forward
-				if last_station_reached
+				if !last_station_reached
 					next_station.add_train(self)
 			 		previous_station.del_train(self)
 				else 
