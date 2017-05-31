@@ -42,7 +42,7 @@ class Station
 	end
 
 	def trains(type = nil)
-		if type != nil 
+		if type
 			@trains.select{|train| train.type == type}
 		else
 			@trains
@@ -138,15 +138,19 @@ class Train
 		end
 	end
 
-	def last_station_reached
+	def at_last_station?
 		current_station_index == self.route.stations.size - 1
+	end
+
+	def at_first_station?
+		current_station_index == 0
 	end
 
 	def depart(destination)
 		if self.route != nil
 			case destination
 			when :forward
-				if !last_station_reached
+				if !at_last_station?
 					next_station.add_train(self)
 			 		previous_station.del_train(self)
 				else 
@@ -154,7 +158,7 @@ class Train
 					return
 				end
 			when :back
-				if current_station_index > 0
+				if !at_first_station
 					previous_station.add_train(self)
 					next_station.del_train(self) #cause methood current_station get first if one train in multiple stations
 				else 
