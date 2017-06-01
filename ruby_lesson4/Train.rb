@@ -52,7 +52,7 @@ class Train
             return
           end
         when :back
-          if !at_first_station
+          if !at_first_station?
             previous_station.add_train(self)
             next_station.del_train(self) #cause methood current_station get first if one train in multiple stations
           else

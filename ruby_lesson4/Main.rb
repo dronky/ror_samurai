@@ -7,23 +7,30 @@ require_relative 'CargoVagon'
 require_relative 'PassengerVagon'
 
 puts "Welcome to RZD Control Tool
-            .---- -  -
-           (   ,----- - -
-            \\_/      ___
-          c--U---^--'o  [_
-          |------------'_|
-         /_(o)(o)--(o)(o)
-   ~ ~~~~~~~~~~~~~~~~~~~~~~~~ ~
-"
+                .---- -  -
+               (   ,----- - -
+                \\_/      ___
+              c--U---^--'o  [_
+              |------------'_|
+             /_(o)(o)--(o)(o)
+       ~ ~~~~~~~~~~~~~~~~~~~~~~~~ ~
+    "
 stations = []
 trains = []
 routes = []
+vagons = []
+
 loop do
   puts '
-  1. Create station
-  2. Create train
-  3. Create route
-  0. exit'
+      1. Create station
+      2. Create train
+      3. Create route
+      4. Create vagon
+      5. Managing vagons (add or delete)
+      6. Managing stations for train (move back or forward)
+      7. List of stations
+      8. Define train route
+      0. exit'
   select = gets.chomp.to_i
   break if select == 0
   case select
@@ -35,8 +42,8 @@ loop do
       train_number = gets.chomp
       loop do
         puts 'Select type:
-        1) Cargo
-        2) Passenger'
+            1) Cargo
+            2) Passenger'
         train_type = gets.chomp.to_i
         if (1..2).include?(train_type)
           trains << CargoTrain.new(train_number) if train_type == 1
@@ -64,49 +71,81 @@ loop do
       else
         puts 'You must have at least 2 stations'
       end
+    when 4
+      puts 'Choose a vagon type:
+                1) Gruz
+                2) Pass'
+      vagon_type = gets.chomp.to_i
+      if (1..2).include?(vagon_type)
+        vagons << CargoVagon.new if vagon_type == 1
+        vagons << PassengerVagon.new if vagon_type == 2
+      end
+    when 5
+      if trains.size >= 1 && vagons.size >= 1
+        puts 'Choose an action:
+                1) Add vagon
+                2) Delete vagon'
+        user_input = gets.chomp.to_i
+        puts 'Choose a train:'
+        trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
+        train = trains[gets.chomp.to_i - 1]
+        if user_input == 1
+          puts 'Choose a vagon for adding:'
+          vagons.each_with_index { |vagon, i| puts "#{i + 1})#{vagon}" }
+          vagon = vagons[gets.chomp.to_i - 1]
+          train.add_vagon(vagon)
+        elsif user_input == 2
+          train.remove_vagon
+        end
+      else
+        puts 'You should add train or vagon at first.'
+      end
+    when 6
+      if trains.size >= 1 && routes.size >= 1
+        puts 'Choose a train:'
+        trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
+        train = trains[gets.chomp.to_i - 1]
+        while !train.route
+          puts 'Choose a route:'
+          routes.each_with_index { |route, i| puts "#{i + 1}) Key Stations: #{route.stations.first} and #{route.stations.last}" }
+          train.route = routes[gets.chomp.to_i - 1]
+        end
+        puts "Current station is #{train.current_station}"
+        puts 'Choose a destination:
+                    1) Back
+                    2) Forward'
+        user_destination = gets.chomp.to_i
+        while !(1..2).include?(user_destination)
+          puts 'Choose correct destination number.'
+          user_destination = gets.chomp.to_i
+        end
+        if (1..2).include?(user_destination)
+          train.depart(:back) if user_destination == 1
+          train.depart(:forward) if user_destination == 2
+        end
+        puts "Current station is #{train.current_station}"
+      end
+    when 7
+      if stations.size >= 1
+        puts "Whole list of stations: "
+        stations.each do |station|
+          puts station
+          station.print_trains
+        end
+      else
+        puts 'There are no stations yet.'
+      end
+    when 8
+      train = nil
+      while !train
+        puts 'Choose a train:'
+        trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
+        train = trains[gets.chomp.to_i - 1]
+      end
+      while !train.route
+        puts 'Choose a route:'
+        routes.each_with_index { |route, i| puts "#{i + 1}) Key Stations: #{route.stations.first} and #{route.stations.last}" }
+        train.route = routes[gets.chomp.to_i - 1]
+      end
   end
 end
-
-puts "Routes: #{routes}"
-puts "Stations: #{stations}"
-puts "Trains #{trains}"
-
-#
-# #Create 4 stations
-# primorsk = Station.new("primorsk")
-# pochinki = Station.new("pochinki")
-# gatka = Station.new("gatka")
-# pushkino = Station.new("pushkino")
-#
-# #and 3 routes
-# route1 = Route.new(primorsk,gatka)
-# route1.add_station(pochinki)
-#
-# route2 = Route.new(gatka,pochinki)
-#
-# route3 = Route.new(pochinki,pushkino)
-#
-# #and 3 trains
-# sapsan = PassengerTrain.new("813hfs211")
-# tg16m = CargoTrain.new("tg16m-005")
-# vityaz = CargoTrain.new("2te25am-019")
-#
-# #assign routes to trains
-# #All trains go to pochinki
-# sapsan.route = route1
-# sapsan.add_vagon(PassengerVagon.new)
-# sapsan.speed = 10
-# sapsan.depart(:forward)
-#
-# tg16m.route = route2
-# tg16m.add_vagon(CargoVagon.new)
-# tg16m.add_vagon(CargoVagon.new)
-# tg16m.depart(:forward)
-#
-# vityaz.route = route3
-#
-# #print trains at stations
-# primorsk.print_trains
-# pochinki.print_trains
-# gatka.print_trains
-# pushkino.print_trains

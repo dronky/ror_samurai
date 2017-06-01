@@ -25,7 +25,7 @@ class Station
   end
 
   def to_s
-    "Station: #{name}"
+    "Station: #{self.name}"
   end
 
   def depart

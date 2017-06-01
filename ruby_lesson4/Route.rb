@@ -27,9 +27,9 @@ class Route
     @stations = [start_station, end_station]
   end
 
-  def to_s
-    stations.each { |station| puts station }
-  end
+  # def to_s
+  #   stations.each { |station| puts station }
+  # end
 
   def add_station(station)
     self.stations.insert(-2, station)
