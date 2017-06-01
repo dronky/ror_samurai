@@ -136,16 +136,20 @@ loop do
         puts 'There are no stations yet.'
       end
     when 8
-      train = nil
-      while !train
-        puts 'Choose a train:'
-        trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
-        train = trains[gets.chomp.to_i - 1]
-      end
-      while !train.route
-        puts 'Choose a route:'
-        routes.each_with_index { |route, i| puts "#{i + 1}) Key Stations: #{route.stations.first} and #{route.stations.last}" }
-        train.route = routes[gets.chomp.to_i - 1]
+      if routes.size != 0
+        train = nil
+        while !train
+          puts 'Choose a train:'
+          trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
+          train = trains[gets.chomp.to_i - 1]
+        end
+        while !train.route
+          puts 'Choose a route:'
+          routes.each_with_index { |route, i| puts "#{i + 1}) Key Stations: #{route.stations.first} and #{route.stations.last}" }
+          train.route = routes[gets.chomp.to_i - 1]
+        end
+      else
+        puts 'No defined routes'
       end
   end
 end
