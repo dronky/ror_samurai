@@ -1,4 +1,5 @@
 require_relative 'module_vendor_name'
+require_relative 'module_Instance_counter'
 
 class Train
 
@@ -9,6 +10,7 @@ class Train
   end
 
   include VendorName
+  include InstanceCounter
 
   attr_accessor :route, :speed, :number, :type, :current_station, :vagons
 
@@ -28,6 +30,7 @@ class Train
     @speed = 0
     @vagons = []
     @@all_trains << self
+    register_instance
   end
 
   def to_s
