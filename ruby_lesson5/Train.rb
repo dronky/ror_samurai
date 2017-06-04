@@ -1,4 +1,14 @@
+require_relative 'module_vendor_name'
+
 class Train
+
+  @@all_trains = Array.new
+
+  def self.find_train_by_num(num)
+    @@all_trains.find{|train| train.number == num}
+  end
+
+  include VendorName
 
   attr_accessor :route, :speed, :number, :type, :current_station, :vagons
 
@@ -17,6 +27,7 @@ class Train
     @type = type
     @speed = 0
     @vagons = []
+    @@all_trains << self
   end
 
   def to_s
