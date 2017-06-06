@@ -1,4 +1,4 @@
-require_relative 'Vagon'
+require_relative 'vagon'
 
 class PassengerVagon < Vagon
   def initialize

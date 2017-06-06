@@ -1,18 +1,23 @@
 require_relative 'module_vendor_name'
-require_relative 'module_Instance_counter'
+require_relative 'module_instance_counter'
 
 class Train
-
-  @@all_trains = Array.new
-
-  def self.find_train_by_num(num)
-    @@all_trains.find{|train| train.number == num}
-  end
 
   include VendorName
   include InstanceCounter
 
   attr_accessor :route, :speed, :number, :type, :current_station, :vagons
+
+
+  @@all = []
+
+  def self.all
+    @@all
+  end
+
+  def self.find_train_by_num(num)
+    @@all.find{|train| train.number == num}
+  end
 
   def route=(route)
     @route = route
@@ -25,11 +30,17 @@ class Train
   end
 
   def initialize(number, type)
-    @number = number
+    @@all.each do |train|
+      if train.number == number
+        abort 'Same number exists. Choose another one.'
+      else
+        @number = number
+      end
+    end
     @type = type
     @speed = 0
     @vagons = []
-    @@all_trains << self
+    @@all << self
     register_instance
   end
 
@@ -125,6 +136,4 @@ class Train
   def at_first_station?
     current_station_index == 0
   end
-
-
 end

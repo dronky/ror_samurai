@@ -1,4 +1,4 @@
-require_relative 'Train'
+require_relative 'train'
 
 class PassengerTrain < Train
 

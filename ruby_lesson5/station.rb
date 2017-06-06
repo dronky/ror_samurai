@@ -1,10 +1,15 @@
+require_relative 'module_instance_counter'
+
 class Station
+
+  include InstanceCounter
+
   attr_reader :name
   attr_accessor :trains
 
-  @@all_stations = Array.new
+  @@all_stations = []
 
-  def self.all_stations
+  def self.all
     @@all_stations
   end
 
