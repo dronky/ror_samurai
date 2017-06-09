@@ -14,6 +14,8 @@ require_relative 'passenger_vagon'
 def create_station
   puts "New station.\nName: "
   @stations << Station.new(gets.chomp)
+  rescue
+    puts "Incorrect station name, please, try again."
 end
 
 def create_train
@@ -30,6 +32,8 @@ def create_train
       break
     end
   end
+  rescue
+  puts "Incorrect train format, please, try again."
 end
 
 def create_route
@@ -52,6 +56,8 @@ def create_route
   else
     raise 'You must have at least 2 @stations'
   end
+  rescue
+  puts "Incorrect route format, please, try again."
 end
 
 def createe_vagon
@@ -119,7 +125,7 @@ def list_stations
     puts "Whole list of @stations: "
     @stations.each do |station|
       puts station
-      station.print_ @trains
+      station.print_trains
     end
   else
     raise 'There are no @stations yet.'
@@ -155,34 +161,33 @@ puts "Welcome to RZD Control Tool
     "
 
 loop do
-  puts '
-      1. Create station
-      2. Create train
-      3. Create route
-      4. Create vagon
-      5. Managing vagons (add or delete)
-      6. Managing stations for train (move back or forward)
-      7. List of stations
-      8. Define train route
-      0. exit'
-  select = gets.chomp.to_i
-  break if select == 0
-  case select
-    when 1
-      create_station
-    when 2
-      create_train
-    when 3
-      create_route
-    when 4
-      createe_vagon
-    when 5
-      manage_vagon
-    when 6
-      manage_station
-    when 7
-      list_stations
-    when 8
-      define_train_route
+  begin
+      File.readlines('menu_items.txt').each_with_index{|line, index| puts "#{index + 1}. #{line}"}
+      select = gets.chomp.to_i
+      case select
+        when 1
+          create_station
+        when 2
+          create_train
+        when 3
+          create_route
+        when 4
+          createe_vagon
+        when 5
+          manage_vagon
+        when 6
+          manage_station
+        when 7
+          list_stations
+        when 8
+          define_train_route
+      end
+  rescue => loop_error
+  ensure
+    break if select == 9
+    next
   end
 end
+# Сейчас для каждого методя я объявил свой обработчик исключений, есть ли способ пробрасывать текст исключения из родительского класса?
+# Например, в опции "Создать поезд" выводится не заданный тут rescue, а resuce, заданный в классе Train, в методе validate! ?
+# Ракетой (=>) я записываю в переменную текст ошибки? Как его потом достать? Можно ли в переменную записать текст ошибки из первичной валидации (см. предыдущий вопрос)? 
