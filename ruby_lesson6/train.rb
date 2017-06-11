@@ -33,19 +33,13 @@ class Train
   end
 
   def initialize(number, type)
-    @@all.each do |train|
-      if train.number == number
-        abort 'Same number exists. Choose another one.'
-      else
-        @number = number
-      end
-    end
+    @number = number
+    validate!
     @type = type
     @speed = 0
     @vagons = []
     @@all << self
     register_instance
-    validate!
   end
 
   def to_s
@@ -122,7 +116,12 @@ class Train
   protected
 
   def validate!
-    raise "Incorrect number format" if number.to_s !~ NUMBER_FORMAT
+    raise 'Incorrect number format' if number.to_s !~ NUMBER_FORMAT
+    @@all.each do |train|
+      if train.number == number
+        raise 'Same number exists. Choose another one.'
+      end
+    end
     # rescue => train_validate_error
     #   puts "Error has been added to the logs."
     # После выполнения этого кода(закомментированого) все-равно создается объект, хотя мы выкидываем исключение в строчке 123, почему?

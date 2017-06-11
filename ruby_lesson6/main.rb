@@ -14,8 +14,8 @@ require_relative 'passenger_vagon'
 def create_station
   puts "New station.\nName: "
   @stations << Station.new(gets.chomp)
-  rescue
-    puts "Incorrect station name, please, try again."
+rescue => e
+  puts e.message
 end
 
 def create_train
@@ -32,35 +32,32 @@ def create_train
       break
     end
   end
-  rescue
-  puts "Incorrect train format, please, try again."
+rescue => e
+  puts e.message
 end
 
 def create_route
-  if @stations.size >= 2
-    puts 'Which station will be first?'
-    @stations.each_with_index { |station, i| puts "#{i + 1})#{station}" }
-    station = @stations[gets.chomp.to_i - 1]
-    if station
-      first_station = station
-      loop do
-        puts 'Which station will be second?'
-        @stations.select { |station| station != first_station }.each_with_index { |station, i| puts "#{i + 1})#{station}" }
-        station = @stations.select { |station| station != first_station }[gets.chomp.to_i - 1]
-        if station
-          @routes << Route.new(first_station, station)
-          break
-        end
+  raise 'You must have at least 2 stations' if @stations.size < 2
+  puts 'Which station will be first?'
+  @stations.each_with_index {|station, i| puts "#{i + 1})#{station}"}
+  station = @stations[gets.chomp.to_i - 1]
+  if station
+    first_station = station
+    loop do
+      puts 'Which station will be second?'
+      @stations.select {|station| station != first_station}.each_with_index {|station, i| puts "#{i + 1})#{station}"}
+      station = @stations.select {|station| station != first_station}[gets.chomp.to_i - 1]
+      if station
+        @routes << Route.new(first_station, station)
+        break
       end
     end
-  else
-    raise 'You must have at least 2 @stations'
   end
-  rescue
-  puts "Incorrect route format, please, try again."
+rescue => e
+  puts e.message
 end
 
-def createe_vagon
+def create_vagon
   puts 'Choose a vagon type:
                 1) Gruz
                 2) Pass'
@@ -72,82 +69,72 @@ def createe_vagon
 end
 
 def manage_vagon
-  if @trains.size >= 1 && @vagons.size >= 1
-    puts 'Choose an action:
+  raise 'You should add train or vagon at first.' unless @trains.size >= 1 && @vagons.size >= 1
+  puts 'Choose an action:
                 1) Add vagon
                 2) Delete vagon'
-    user_input = gets.chomp.to_i
-    puts 'Choose a train:'
-    @trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
-    train = @trains[gets.chomp.to_i - 1]
-    if user_input == 1
-      puts 'Choose a vagon for adding:'
-      @vagons.each_with_index { |vagon, i| puts "#{i + 1})#{vagon}" }
-      vagon = @vagons[gets.chomp.to_i - 1]
-      train.add_vagon(vagon)
-    elsif user_input == 2
-      train.remove_vagon
-    end
-  else
-    raise 'You should add train or vagon at first.'
+  user_input = gets.chomp.to_i
+  puts 'Choose a train:'
+  @trains.each_with_index {|train, i| puts "#{i + 1})#{train}"}
+  train = @trains[gets.chomp.to_i - 1]
+  if user_input == 1
+    puts 'Choose a vagon for adding:'
+    @vagons.each_with_index {|vagon, i| puts "#{i + 1})#{vagon}"}
+    vagon = @vagons[gets.chomp.to_i - 1]
+    train.add_vagon(vagon)
+  elsif user_input == 2
+    train.remove_vagon
   end
 end
 
 def manage_station
-  if @trains.size >= 1 && @routes.size >= 1
-    puts 'Choose a train:'
-    @trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
-    train = @trains[gets.chomp.to_i - 1]
-    until train.route
-      puts 'Choose a route:'
-      @routes.each_with_index { |route, i| puts "#{i + 1}) Key @stations: #{route.stations.first} and #{route.stations.last}" }
-      train.route = @routes[gets.chomp.to_i - 1]
-    end
-    puts "Current station is #{train.current_station}"
-    puts 'Choose a destination:
+  raise 'You should have at least 1 train and 1 route' if @trains.size < 1 && @routes.size < 1
+  puts 'Choose a train:'
+  @trains.each_with_index {|train, i| puts "#{i + 1})#{train}"}
+  train = @trains[gets.chomp.to_i - 1]
+  until train.route
+    puts 'Choose a route:'
+    @routes.each_with_index {|route, i| puts "#{i + 1}) Key @stations: #{route.stations.first} and #{route.stations.last}"}
+    train.route = @routes[gets.chomp.to_i - 1]
+  end
+  puts "Current station is #{train.current_station}"
+  puts 'Choose a destination:
                     1) Back
                     2) Forward'
+  user_destination = gets.chomp.to_i
+  until (1..2).include?(user_destination)
+    puts 'Choose correct destination number.'
     user_destination = gets.chomp.to_i
-    until (1..2).include?(user_destination)
-      puts 'Choose correct destination number.'
-      user_destination = gets.chomp.to_i
-    end
-    if (1..2).include?(user_destination)
-      train.depart(:back) if user_destination == 1
-      train.depart(:forward) if user_destination == 2
-    end
-    puts "Current station is #{train.current_station}"
   end
+  if (1..2).include?(user_destination)
+    train.depart(:back) if user_destination == 1
+    train.depart(:forward) if user_destination == 2
+  end
+  puts "Current station is #{train.current_station}"
 end
 
 def list_stations
-  if @stations.size >= 1
-    puts "Whole list of @stations: "
-    @stations.each do |station|
-      puts station
-      station.print_trains
-    end
-  else
-    raise 'There are no @stations yet.'
+  raise 'There are no stations yet.' if @stations.size < 1
+  puts "Whole list of stations: "
+  @stations.each do |station|
+    puts station
+    station.print_trains
   end
 end
 
 def define_train_route
-  if @routes.size != 0 && @trains.size != 0
+  raise 'No defined routes or trains' unless @routes.size != 0 && @trains.size != 0
     train = nil
     until train
       puts 'Choose a train:'
-      @trains.each_with_index { |train, i| puts "#{i + 1})#{train}" }
+      @trains.each_with_index {|train, i| puts "#{i + 1})#{train}"}
       train = @trains[gets.chomp.to_i - 1]
     end
     until train.route
       puts 'Choose a route:'
-      @routes.each_with_index { |route, i| puts "#{i + 1}) Key stations: #{route.stations.first} and #{route.stations.last}" }
+      @routes.each_with_index {|route, i| puts "#{i + 1}) Key stations: #{route.stations.first} and #{route.stations.last}"}
       train.route = @routes[gets.chomp.to_i - 1]
     end
-  else
-    raise 'No defined routes or trains'
-  end
 end
 
 puts "Welcome to RZD Control Tool
@@ -162,27 +149,28 @@ puts "Welcome to RZD Control Tool
 
 loop do
   begin
-      File.readlines('menu_items.txt').each_with_index{|line, index| puts "#{index + 1}. #{line}"}
-      select = gets.chomp.to_i
-      case select
-        when 1
-          create_station
-        when 2
-          create_train
-        when 3
-          create_route
-        when 4
-          createe_vagon
-        when 5
-          manage_vagon
-        when 6
-          manage_station
-        when 7
-          list_stations
-        when 8
-          define_train_route
-      end
-  rescue => loop_error
+    File.readlines('menu_items.txt').each_with_index {|line, index| puts "#{index + 1}. #{line}"}
+    select = gets.chomp.to_i
+    case select
+      when 1
+        create_station
+      when 2
+        create_train
+      when 3
+        create_route
+      when 4
+        create_vagon
+      when 5
+        manage_vagon
+      when 6
+        manage_station
+      when 7
+        list_stations
+      when 8
+        define_train_route
+    end
+  rescue => e
+    puts e.message
   ensure
     break if select == 9
     next

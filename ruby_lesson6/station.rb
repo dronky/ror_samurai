@@ -72,7 +72,7 @@ class Station
       end
       print_train(type)
     else
-      raise "No trains in #{self.name}"
+      puts "No trains in #{self.name}"
     end
   end
 
