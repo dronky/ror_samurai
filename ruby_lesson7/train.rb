@@ -18,6 +18,16 @@ class Train
     @@all
   end
 
+  # Вопрос по
+  # def each_vagon(block)
+  #   vagons.each{block.call}
+  # end
+  # смотри main.rb строчка 154
+
+  def each_vagon(&block)
+    vagons.each(&block)
+  end
+
   def self.find_train_by_num(num)
     @@all.find {|train| train.number == num}
   end

@@ -29,6 +29,10 @@ class Station
   #   self.trains << train
   # end
 
+  def each_train(block)
+    trains.each { block.call }
+  end
+
   def del_train(train)
     self.trains.delete(train)
   end

@@ -63,8 +63,17 @@ def create_vagon
                 2) Pass'
   vagon_type = gets.chomp.to_i
   if (1..2).include?(vagon_type)
-    @vagons << CargoVagon.new if vagon_type == 1
-    @vagons << PassengerVagon.new if vagon_type == 2
+    if vagon_type == 1
+      puts 'Set a volume'
+      volume = gets.chomp.to_i
+      @vagons << CargoVagon.new(volume)
+      # не знаешь, почему у меня RM ругается на эту строку "Found 1 extra argument"? Код отрабатывает.
+    end
+    if vagon_type == 2
+      puts 'Set a number of seats'
+      number_seats = gets.chomp.to_i
+      @vagons << PassengerVagon.new(number_seats)
+    end
   end
 end
 
@@ -137,6 +146,41 @@ def define_train_route
     end
 end
 
+def show_vagons_for_train
+  raise "You should define train and vagon at first" if @trains.empty? && @vagons.empty?
+  puts 'Choose a train:'
+  @trains.each_with_index {|train, i| puts "#{i + 1})#{train}"}
+  train = @trains[gets.chomp.to_i - 1]
+  # listing = proc {|i| puts i}
+  # train.each_vagon {listing}
+  # почему в этом случае код не отработает? Я понимаю, что в train.rb я не передают аргумент в блок, но тут он разве не должен подхватываться?
+  # видимо, я не до коцна понял разницу между def method(block) и def method(&block).
+  train.each_vagon {|i| puts "Vagon type: #{i.type}";
+  if i.type == :cargo;
+    puts "Vagon volume: #{i.volume}";
+    puts "Reserved volume: #{i.reserved_volume}";
+  elsif i.type == :pass;
+    puts "Number of seats: #{i.number_seates}";
+    puts "Number of reserved seats: #{i.reserved_seats}";
+  end }
+  # Какая-то не очень красивая запись получилась (но рабочая), есть способ как-то этот код отрефакторить?
+end
+
+def edit_vagon
+  raise "You should create at least one vagon before edit" if @vagons.empty?
+  puts "Choose a vagon:"
+  @vagons.each_with_index {|vagon, i| puts "#{i + 1})#{vagon}"}
+  user_vagon = @vagons[gets.chomp.to_i - 1]
+  if user_vagon.type == :cargo
+    puts "Set a volume for adding"
+    added_volume = gets.chomp.to_i
+    user_vagon.add_volume(added_volume)
+  elsif user_vagon.type == :pass
+    user_vagon.add_seat
+    puts "One seat has been reserved. Remains seats for reserve: #{user_vagon.free_seats?}."
+  end
+end
+
 puts "Welcome to RZD Control Tool
                 .---- -  -
                (   ,----- - -
@@ -168,14 +212,15 @@ loop do
         list_stations
       when 8
         define_train_route
+      when 9
+        show_vagons_for_train
+      when 10
+        edit_vagon
     end
   rescue => e
     puts e.message
   ensure
-    break if select == 9
+    break if select == 11
     next
   end
 end
-# Сейчас для каждого методя я объявил свой обработчик исключений, есть ли способ пробрасывать текст исключения из родительского класса?
-# Например, в опции "Создать поезд" выводится не заданный тут rescue, а resuce, заданный в классе Train, в методе validate! ?
-# Ракетой (=>) я записываю в переменную текст ошибки? Как его потом достать? Можно ли в переменную записать текст ошибки из первичной валидации (см. предыдущий вопрос)? 

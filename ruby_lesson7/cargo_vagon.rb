@@ -14,11 +14,11 @@ class CargoVagon < Vagon
   def add_volume(cubic_meter)
     raise "You've reached the limit of volume" if self.reserved_volume + cubic_meter >= self.volume
     # rubymine подсказывает, что reduntant "self" detected, хотя в одном из скринкастов говорилось, что self надо писать обязательно. Где правда? :)
-    puts self.reserved_volume += cubic_meter
+    self.reserved_volume += cubic_meter
   end
 
   def free_volume?
-    puts self.volume - self.reserved_volume
+    self.volume - self.reserved_volume
   end
 
   protected

@@ -13,11 +13,11 @@ class PassengerVagon < Vagon
 
   def add_seat
     validate!
-    puts self.reserved_seats += 1
+    self.reserved_seats += 1
   end
 
   def free_seats?
-    puts self.number_seates - self.reserved_seats
+    self.number_seates - self.reserved_seats
   end
 
   protected

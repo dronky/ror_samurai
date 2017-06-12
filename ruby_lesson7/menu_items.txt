@@ -6,4 +6,6 @@ Managing vagons (add or delete)
 Managing stations for train (move back or forward)
 List of stations
 Define train route
+List of vagons for the train
+Edit vagon
 exit
