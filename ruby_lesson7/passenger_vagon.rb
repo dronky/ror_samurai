@@ -12,22 +12,19 @@ class PassengerVagon < Vagon
   end
 
   def add_seat
-    validate!
-    self.reserved_seats += 1
+    raise "You've reached the limit of seats" if reserved_seats + 1 >= number_seates
+    @reserved_seats += 1
   end
 
   def free_seats?
-    self.number_seates - self.reserved_seats
+    @number_seates - @reserved_seats
   end
 
   protected
 
-  attr_writer :number_seates, :reserved_seats
-
   def validate!
-    raise "Only numbers available" unless self.number_seates.instance_of?(Fixnum)
-    raise "Number_seats field couldn't be zero" if self.number_seates.zero?
-    raise "You've reached the limit of seats" if self.reserved_seats + 1 >= self.number_seates
+    raise "Only numbers available" unless number_seates.instance_of?(Integer)
+    raise "Number_seats field couldn't be zero" if number_seates.zero?
     true
   end
 end

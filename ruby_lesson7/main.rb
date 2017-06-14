@@ -133,17 +133,17 @@ end
 
 def define_train_route
   raise 'No defined routes or trains' unless @routes.size != 0 && @trains.size != 0
-    train = nil
-    until train
-      puts 'Choose a train:'
-      @trains.each_with_index {|train, i| puts "#{i + 1})#{train}"}
-      train = @trains[gets.chomp.to_i - 1]
-    end
-    until train.route
-      puts 'Choose a route:'
-      @routes.each_with_index {|route, i| puts "#{i + 1}) Key stations: #{route.stations.first} and #{route.stations.last}"}
-      train.route = @routes[gets.chomp.to_i - 1]
-    end
+  train = nil
+  until train
+    puts 'Choose a train:'
+    @trains.each_with_index {|train, i| puts "#{i + 1})#{train}"}
+    train = @trains[gets.chomp.to_i - 1]
+  end
+  until train.route
+    puts 'Choose a route:'
+    @routes.each_with_index {|route, i| puts "#{i + 1}) Key stations: #{route.stations.first} and #{route.stations.last}"}
+    train.route = @routes[gets.chomp.to_i - 1]
+  end
 end
 
 def show_vagons_for_train
@@ -155,15 +155,18 @@ def show_vagons_for_train
   # train.each_vagon {listing}
   # почему в этом случае код не отработает? Я понимаю, что в train.rb я не передают аргумент в блок, но тут он разве не должен подхватываться?
   # видимо, я не до коцна понял разницу между def method(block) и def method(&block).
-  train.each_vagon {|i| puts "Vagon type: #{i.type}";
-  if i.type == :cargo;
-    puts "Vagon volume: #{i.volume}";
-    puts "Reserved volume: #{i.reserved_volume}";
-  elsif i.type == :pass;
-    puts "Number of seats: #{i.number_seates}";
-    puts "Number of reserved seats: #{i.reserved_seats}";
-  end }
-  # Какая-то не очень красивая запись получилась (но рабочая), есть способ как-то этот код отрефакторить?
+  train.each do |i|
+    puts "Vagon type: #{i.type}"
+    case i.type
+    when :cargo
+      puts "Vagon volume: #{i.volume}"
+      puts "Reserved volume: #{i.reserved_volume}"
+    when :pass
+      puts "Number of seats: #{i.number_seates}"
+      puts "Number of reserved seats: #{i.reserved_seats}"
+    end
+  end
+# Какая-то не очень красивая запись получилась (но рабочая), есть способ как-то этот код отрефакторить?
 end
 
 def edit_vagon

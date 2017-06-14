@@ -24,7 +24,7 @@ class Train
   # end
   # смотри main.rb строчка 154
 
-  def each_vagon(&block)
+  def each(&block)
     vagons.each(&block)
   end
 
