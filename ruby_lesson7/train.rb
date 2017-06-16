@@ -3,33 +3,27 @@ require_relative 'module_instance_counter'
 require_relative 'valid_module'
 
 class Train
-
   include VendorName
   include InstanceCounter
   include Valid
 
   attr_accessor :route, :speed, :number, :type, :current_station, :vagons
+  attr_reader :all
 
   NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i
 
-  @@all = []
+  @all = []
 
-  def self.all
-    @@all
+  class << self
+    all
   end
-
-  # Вопрос по
-  # def each_vagon(block)
-  #   vagons.each{block.call}
-  # end
-  # смотри main.rb строчка 154
 
   def each(&block)
     vagons.each(&block)
   end
 
   def self.find_train_by_num(num)
-    @@all.find {|train| train.number == num}
+    @all.find { |train| train.number == num }
   end
 
   def route=(route)
@@ -48,12 +42,12 @@ class Train
     @type = type
     @speed = 0
     @vagons = []
-    @@all << self
+    @all << self
     register_instance
   end
 
   def to_s
-    "Number: #{self.number} Type: #{self.type} Vagons count: #{self.vagons.size()}"
+    "Number: #{number} Type: #{type} Vagons count: #{vagons.size}"
   end
 
   def increase_speed(speed_gain)
@@ -65,20 +59,20 @@ class Train
   end
 
   def add_vagon(vagon)
-    if self.type == vagon.type
-      if self.speed == 0
+    if type == vagon.type
+      if self.speed.zero?
         vagons << vagon
       else
         raise 'stop train before'
       end
     else
-      raise "Only #{self.type} vagon type is availible."
+      raise "Only #{type} vagon type is availible."
     end
   end
 
   def remove_vagon
-    if self.vagons.size > 1
-      if self.speed == 0
+    if vagons.size > 1
+      if self.speed.zero?
         vagons.delete(vagons.last)
       else
         raise 'stop train before'
@@ -87,39 +81,38 @@ class Train
   end
 
   def move_next_station
-    unless at_last_station?
-      add_train_to_station(self.next_station)
-      previous_station.del_train(self)
+    if at_last_station?
+      puts 'you reached last station'
+      nil
     else
-      puts "you reached last station"
-      return
+      add_train_to_station(next_station)
+      previous_station.del_train(self)
     end
   end
 
   def move_previous_station
-    unless at_first_station?
-      add_train_to_station(self.previous_station)
-      next_station.del_train(self) #cause methood current_station get first if one train in multiple stations
+    if at_first_station?
+      puts 'you reached first station'
+      nil
     else
-      puts "you reached first station"
-      return
+      add_train_to_station(previous_station)
+      next_station.del_train(self) # cause methood current_station get first if one train in multiple stations
     end
   end
 
   def depart(destination)
-    if self.route != nil
+    if !route.nil?
       case destination
-        when :forward
-          move_next_station
-        when :back
-          move_previous_station
-        else
-          raise "wrong destination! (#{destination}) It can be :forward or :back"
-          return
+      when :forward
+        move_next_station
+      when :back
+        move_previous_station
+      else
+        raise "wrong destination! (#{destination}) It can be :forward or :back"
       end
-      self.stop
+      stop
     else
-      raise "set route before depart"
+      raise 'set route before depart'
     end
   end
 
@@ -127,33 +120,28 @@ class Train
 
   def validate!
     raise 'Incorrect number format' if number.to_s !~ NUMBER_FORMAT
-    @@all.each do |train|
-      if train.number == number
-        raise 'Same number exists. Choose another one.'
-      end
+    @all.each do |train|
+      raise 'Same number exists. Choose another one.' if train.number == number
     end
-    # rescue => train_validate_error
-    #   puts "Error has been added to the logs."
-    # После выполнения этого кода(закомментированого) все-равно создается объект, хотя мы выкидываем исключение в строчке 123, почему?
   end
 
   def current_station_index
-    self.route.stations.index(current_station)
+    route.stations.index(current_station)
   end
 
   def next_station
-    self.route.stations[current_station_index + 1]
+    route.stations[current_station_index + 1]
   end
 
   def previous_station
-    self.route.stations[current_station_index - 1]
+    route.stations[current_station_index - 1]
   end
 
   def at_last_station?
-    current_station_index == self.route.stations.size - 1
+    current_station_index == route.stations.size - 1
   end
 
   def at_first_station?
-    current_station_index == 0
+    current_station_index.zero?
   end
 end

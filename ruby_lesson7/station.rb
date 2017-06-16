@@ -2,7 +2,6 @@ require_relative 'module_instance_counter'
 require_relative 'valid_module'
 
 class Station
-
   include InstanceCounter
   include Valid
 
@@ -11,16 +10,16 @@ class Station
 
   NAME_FORMAT = /^[a-z]*$/i
 
-  @@all_stations = []
+  @all_stations = []
 
   def self.all
-    @@all_stations
+    @all_stations
   end
 
   def initialize(name)
     @trains = []
     @name = name
-    @@all_stations << self
+    @all_stations << self
     validate!
   end
 
@@ -34,23 +33,23 @@ class Station
   end
 
   def del_train(train)
-    self.trains.delete(train)
+    trains.delete(train)
   end
 
   def trains(type = nil)
     if type
-      @trains.select {|train| train.type == type}
+      @trains.select { |train| train.type == type }
     else
       @trains
     end
   end
 
   def to_s
-    "Station: #{self.name}"
+    "Station: #{name}"
   end
 
   def depart
-    self.trains.first.depart(:forward)
+    trains.first.depart(:forward)
   end
 
   def print_train(type = nil)
@@ -61,29 +60,28 @@ class Station
   end
 
   def print_trains(type = nil)
-    puts "\n#{self.name} trains:"
-    if self.trains.size > 0
+    puts "\n#{name} trains:"
+    if !trains.empty?
       case type
-        when nil
-          puts "Gruz trains: #{trains("gruz").size} Pass trains: #{trains("pass").size}"
-        when "gruz"
-          puts "Gruz trains: #{trains("gruz").size}"
-        when "pass"
-          puts "Pass trains: #{trains("pass").size}"
-        else
-          raise "wrong train type"
-          return
+      when nil
+        puts "Gruz trains: #{trains('gruz').size} Pass trains: #{trains('pass').size}"
+      when 'gruz'
+        puts "Gruz trains: #{trains('gruz').size}"
+      when 'pass'
+        puts "Pass trains: #{trains('pass').size}"
+      else
+        raise 'wrong train type'
       end
       print_train(type)
     else
-      puts "No trains in #{self.name}"
+      puts "No trains in #{name}"
     end
   end
 
   protected
 
   def validate!
-    raise "Only letters available" if name !~ NAME_FORMAT
+    raise 'Only letters available' if name !~ NAME_FORMAT
     raise "Name field couldn't be empty" if name.empty?
     true
   end

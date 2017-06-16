@@ -1,5 +1,4 @@
 module InstanceCounter
-
   def self.included(base)
     base.extend(ClassMethods)
     base.include(InstanceMethoods)
@@ -21,7 +20,6 @@ module InstanceCounter
   end
 
   module InstanceMethoods
-
     protected
 
     def register_instance

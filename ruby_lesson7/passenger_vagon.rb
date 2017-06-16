@@ -1,7 +1,6 @@
 require_relative 'vagon'
 
 class PassengerVagon < Vagon
-
   attr_reader :number_seates, :reserved_seats
 
   def initialize(number_seats)
@@ -23,7 +22,7 @@ class PassengerVagon < Vagon
   protected
 
   def validate!
-    raise "Only numbers available" unless number_seates.instance_of?(Integer)
+    raise 'Only numbers available' unless number_seates.instance_of?(Integer)
     raise "Number_seats field couldn't be zero" if number_seates.zero?
     true
   end
