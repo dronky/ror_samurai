@@ -1,12 +1,15 @@
 require_relative 'module_instance_counter'
 require_relative 'valid_module'
+require_relative 'module_validation'
 
 class Station
   include InstanceCounter
   include Valid
+  extend Validation
 
   attr_reader :name
   attr_accessor :trains
+  validate :name, :presence
 
   NAME_FORMAT = /^[a-z]*$/i
 
@@ -22,11 +25,6 @@ class Station
     @@all_stations << self
     validate!
   end
-
-  # def add_train(train)
-  #   train.current_station = self
-  #   self.trains << train
-  # end
 
   def each(&block)
     trains.each(&block)
@@ -76,13 +74,5 @@ class Station
     else
       puts "No trains in #{name}"
     end
-  end
-
-  protected
-
-  def validate!
-    raise 'Only letters available' if name !~ NAME_FORMAT
-    raise "Name field couldn't be empty" if name.empty?
-    true
   end
 end

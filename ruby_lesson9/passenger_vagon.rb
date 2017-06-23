@@ -1,7 +1,11 @@
 require_relative 'vagon'
+require_relative 'module_validation'
 
 class PassengerVagon < Vagon
+  extend Validation
   attr_reader :number_seates, :reserved_seats
+
+  validate :number_seates, :type, Integer
 
   def initialize(number_seats)
     super(:pass)
@@ -17,13 +21,5 @@ class PassengerVagon < Vagon
 
   def free_seats?
     @number_seates - @reserved_seats
-  end
-
-  protected
-
-  def validate!
-    raise 'Only numbers available' unless number_seates.instance_of?(Fixnum)
-    raise "Number_seats field couldn't be zero" if number_seates.zero?
-    true
   end
 end

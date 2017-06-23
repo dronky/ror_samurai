@@ -1,16 +1,20 @@
 require_relative 'module_vendor_name'
 require_relative 'module_instance_counter'
 require_relative 'valid_module'
+require_relative 'module_validation'
 
 class Train
   include VendorName
   include InstanceCounter
   include Valid
+  extend Validation
 
   attr_accessor :route, :speed, :number, :type, :current_station, :vagons
   attr_reader :all
 
   NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i
+
+  validate :number, :format, NUMBER_FORMAT
 
   @@all = []
 
@@ -96,7 +100,7 @@ class Train
       nil
     else
       add_train_to_station(previous_station)
-      next_station.del_train(self) # cause methood current_station get first if one train in multiple stations
+      next_station.del_train(self)
     end
   end
 
@@ -117,13 +121,6 @@ class Train
   end
 
   protected
-
-  def validate!
-    raise 'Incorrect number format' if number.to_s !~ NUMBER_FORMAT
-    @@all.each do |train|
-      raise 'Same number exists. Choose another one.' if train.number == number
-    end
-  end
 
   def current_station_index
     route.stations.index(current_station)

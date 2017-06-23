@@ -1,7 +1,11 @@
 require_relative 'vagon'
+require_relative 'module_validation'
 
 class CargoVagon < Vagon
+  extend Validation
   attr_reader :volume, :reserved_volume
+
+  validate :volume, :type, Integer
 
   def initialize(volume)
     super(:cargo)
@@ -17,13 +21,5 @@ class CargoVagon < Vagon
 
   def free_volume?
     @volume - @reserved_volume
-  end
-
-  protected
-
-  def validate!
-    raise 'Only numbers available' unless @volume.instance_of?(Fixnum)
-    raise "Volume field couldn't be zero" if @volume.zero?
-    true
   end
 end
