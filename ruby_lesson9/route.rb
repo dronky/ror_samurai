@@ -1,7 +1,7 @@
-require_relative 'valid_module'
+require_relative 'modules/module_validation'
 
 class Route
-  include Valid
+  include Validation
 
   attr_reader :stations
 
@@ -24,8 +24,8 @@ class Route
 
   protected
 
-  def validate!
-    raise "Station should be 'Station' type" if stations.any? { |station| !station.instance_of?(Station) }
-    raise 'Station couldnt be empty' if stations.any? { |station| station.to_s.empty? }
-  end
+  # def validate!
+  #   raise "Station should be 'Station' type" if stations.any? { |station| !station.instance_of?(Station) }
+  #   raise 'Station couldnt be empty' if stations.any? { |station| station.to_s.empty? }
+  # end
 end

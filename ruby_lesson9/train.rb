@@ -1,20 +1,14 @@
-require_relative 'module_vendor_name'
-require_relative 'module_instance_counter'
-require_relative 'valid_module'
-require_relative 'module_validation'
+require_relative 'modules/module_vendor_name'
+require_relative 'modules/module_instance_counter'
 
 class Train
   include VendorName
   include InstanceCounter
-  include Valid
-  extend Validation
 
   attr_accessor :route, :speed, :number, :type, :current_station, :vagons
   attr_reader :all
 
   NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i
-
-  validate :number, :format, NUMBER_FORMAT
 
   @@all = []
 
@@ -42,7 +36,6 @@ class Train
 
   def initialize(number, type)
     @number = number
-    validate!
     @type = type
     @speed = 0
     @vagons = []

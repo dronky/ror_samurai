@@ -1,17 +1,16 @@
-require_relative 'module_instance_counter'
-require_relative 'valid_module'
-require_relative 'module_validation'
+require_relative 'modules/module_instance_counter'
+require_relative 'modules/module_validation'
 
 class Station
   include InstanceCounter
-  include Valid
-  extend Validation
+  include Validation
+
+  NAME_FORMAT = /^[a-z]*$/i
 
   attr_reader :name
   attr_accessor :trains
   validate :name, :presence
-
-  NAME_FORMAT = /^[a-z]*$/i
+  validate :name, :format, NAME_FORMAT
 
   @@all_stations = []
 
@@ -61,14 +60,14 @@ class Station
     puts "\n#{name} trains:"
     if !trains.empty?
       case type
-      when nil
-        puts "Gruz trains: #{trains('gruz').size} Pass trains: #{trains('pass').size}"
-      when 'gruz'
-        puts "Gruz trains: #{trains('gruz').size}"
-      when 'pass'
-        puts "Pass trains: #{trains('pass').size}"
-      else
-        raise 'wrong train type'
+        when nil
+          puts "Gruz trains: #{trains('gruz').size} Pass trains: #{trains('pass').size}"
+        when 'gruz'
+          puts "Gruz trains: #{trains('gruz').size}"
+        when 'pass'
+          puts "Pass trains: #{trains('pass').size}"
+        else
+          raise 'wrong train type'
       end
       print_train(type)
     else

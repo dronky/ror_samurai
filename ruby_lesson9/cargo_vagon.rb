@@ -1,11 +1,11 @@
 require_relative 'vagon'
-require_relative 'module_validation'
+require_relative 'modules/module_validation'
 
 class CargoVagon < Vagon
-  extend Validation
+  include Validation
   attr_reader :volume, :reserved_volume
 
-  validate :volume, :type, Integer
+  validate :volume, :type, Fixnum
 
   def initialize(volume)
     super(:cargo)

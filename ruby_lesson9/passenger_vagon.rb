@@ -1,11 +1,11 @@
 require_relative 'vagon'
-require_relative 'module_validation'
+require_relative 'modules/module_validation'
 
 class PassengerVagon < Vagon
-  extend Validation
+  include Validation
   attr_reader :number_seates, :reserved_seats
 
-  validate :number_seates, :type, Integer
+  validate :number_seates, :type, Fixnum
 
   def initialize(number_seats)
     super(:pass)
