@@ -25,7 +25,7 @@ module Validation
     def validate!
       self.class.valid_list.each { |validation|
         value = instance_variable_get("@#{validation[:attr_name]}")
-        self.send validation[:valid_type].to_sym, value, validation[:params]
+        self.send validation[:valid_type], value, validation[:params]
       }
     end
 
@@ -47,7 +47,7 @@ module Validation
       end
     end
 
-    def validate_format(value, params = nil)
+    def validate_format(value, params)
       if params.match(value)
         true
       else
@@ -55,11 +55,11 @@ module Validation
       end
     end
 
-    def validate_type(value, params = nil)
+    def validate_type(value, params)
       if value.instance_of?(params)
         true
       else
-        raise "#{value} not match @#{params}"
+        raise "#{value} not match #{params}"
       end
     end
   end
@@ -70,7 +70,7 @@ class Test
   attr_accessor :paresence_var, :fmt_var, :class_val
   validate :presence_var, :presence
   validate :fmt_var, :format, /^[a-z0-9]{3}-?[a-z0-9]{2}$/i
-  validate :class_val, :type, Fixnum
+  validate :class_val, :type, Integer
 
   def initialize(pre, fmt, class_val)
     @pre = pre
@@ -81,3 +81,4 @@ class Test
 end
 
 # a = Test.new('8', 'aaa-11',22)
+b = Test.new('1', 'asd', 1)
