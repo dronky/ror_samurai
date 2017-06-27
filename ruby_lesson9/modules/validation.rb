@@ -8,46 +8,41 @@ module Validation
     attr_accessor :valid_list
 
     def validate(atr_name, valid_type, params = nil)
-      @valid_list = []
-      case valid_type
-        when :presence
-          @valid_list << {attr_name: atr_name, valid_type: 'validate_presence', params: params}
-        when :format
-          @valid_list << {attr_name: atr_name, valid_type: 'validate_format', params: params}
-        when :type
-          @valid_list << {attr_name: atr_name, valid_type: 'validate_type', params: params}
-      end
+      @valid_list ||= []
+      @valid_list.push(atr_name: atr_name, valid_type: valid_type, params: params)
     end
   end
 
   module InstanceMethods
 
     def validate!
-      self.class.valid_list.each { |validation|
-        value = instance_variable_get("@#{validation[:attr_name]}")
-        self.send validation[:valid_type], value, validation[:params]
-      }
+      self.class.valid_list.each do |validation|
+        value = instance_variable_get("@#{validation[:atr_name]}")
+        method_name = validation[:valid_type]
+        if method(method_name).arity > 1
+          send(method_name, value, validation[:params])
+        else
+          send(method_name, value)
+        end
+      end
     end
 
     def valid?
-      if validate!
+      begin
+        validate!
         true
-      else
+      rescue
         false
       end
     end
 
     private
 
-    def validate_presence(value)
-      if value.nil? || value.empty?
-        raise "Argument couldn't be nil"
-      else
-        true
-      end
+    def presence(value)
+      raise "Argument couldn't be nil" if value.nil? || value.empty?
     end
 
-    def validate_format(value, params)
+    def format(value, params)
       if params.match(value)
         true
       else
@@ -55,7 +50,7 @@ module Validation
       end
     end
 
-    def validate_type(value, params)
+    def type(value, params)
       if value.instance_of?(params)
         true
       else
@@ -81,4 +76,3 @@ class Test
 end
 
 # a = Test.new('8', 'aaa-11',22)
-b = Test.new('1', 'asd', 1)

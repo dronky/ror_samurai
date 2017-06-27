@@ -22,11 +22,8 @@ module Accessor
       var_name = "@#{name}".to_sym
       define_method(name) { instance_variable_get(var_name) }
       define_method("#{name}=".to_sym) do |value|
-        if value.instance_of?(type)
-          instance_variable_set(var_name, value)
-        else
-          raise "Argument isn't #{type} type."
-        end
+        raise "Argument isn't #{type} type." unless value.instance_of?(type)
+        instance_variable_set(var_name, value)
       end
     end
   end
